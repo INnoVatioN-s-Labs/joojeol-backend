@@ -21,4 +21,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             ORDER BY p.createdAt DESC
             """)
     List<Post> searchByKeyword(@Param("keyword") String keyword);
+    
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.postLikeList WHERE p.id = :id")
+    java.util.Optional<Post> findByIdWithLikes(UUID id);
 }
