@@ -37,7 +37,7 @@ public class PostRes {
     public PostRes(Post post) {
         this.id = post.getId();
         this.content = post.getContent();
-        this.reactionCount = post.getReactionCount();
+        this.reactionCount = post.getLikeCount();
         this.imageUrl = post.getImageUrl();
         this.hashtags = post.getHashtags();
         this.createdAt = post.getCreatedAt();
