@@ -52,23 +52,6 @@ public class Post {
         return postLikeList.size();
     }
 
-    public void addLike() {
-        this.postLikeList.add(PostLike.create(this));
-    }
-
-    public void removeLike() {
-        if (!postLikeList.isEmpty()) {
-            java.util.Iterator<PostLike> it = postLikeList.iterator();
-            PostLike last = null;
-            while (it.hasNext()) {
-                last = it.next();
-            }
-            if (last != null) {
-                postLikeList.remove(last);
-            }
-        }
-    }
-
     public void setReacted(boolean reacted) {
         this.isReacted = reacted;
     }
