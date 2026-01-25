@@ -1,31 +1,39 @@
 package com.assignment.joojeolbackend.controller;
 
 import com.assignment.joojeolbackend.domain.Comment;
+import com.assignment.joojeolbackend.dto.comment.CommentCreateReq;
+import com.assignment.joojeolbackend.dto.comment.CommentRes;
+import com.assignment.joojeolbackend.dto.common.ReturnMessage;
 import com.assignment.joojeolbackend.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/posts/{postId}/comments")
+@RequestMapping("/posts/{postId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final BoardService boardService;
 
     @GetMapping
-    public List<Comment> getComments(@PathVariable UUID postId) {
-        return boardService.getCommentsByPostId(postId);
+    public ReturnMessage<List<CommentRes>> getComments(@PathVariable UUID postId) {
+        List<Comment> comments = boardService.getCommentsByPostId(postId);
+        List<CommentRes> commentResList = comments.stream()
+                .map(CommentRes::new)
+                .collect(Collectors.toList());
+        return new ReturnMessage<>(commentResList);
     }
 
     @PostMapping
-    public Comment createComment(
+    public ReturnMessage<CommentRes> createComment(
             @PathVariable UUID postId,
-            @RequestBody Map<String, String> body
+            @RequestBody CommentCreateReq req
     ) {
-        return boardService.createComment(postId, body.get("content"), body.get("parentId"));
+        Comment comment = boardService.createComment(postId, req.getContent(), req.getParentId());
+        return new ReturnMessage<>(new CommentRes(comment));
     }
 }
