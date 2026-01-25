@@ -13,42 +13,28 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "post_liked")
-public class PostLiked {
+@Table(name = "post_likes")
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
-    @Column(nullable = false)
-    private int likeCount;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Builder
-    public PostLiked(Post post, Integer likeCount) {
+    public PostLike(Post post) {
         this.post = post;
-        this.likeCount = likeCount != null ? likeCount : 0;
     }
 
-    public static PostLiked create(Post post) {
-        return PostLiked.builder()
+    public static PostLike create(Post post) {
+        return PostLike.builder()
                 .post(post)
                 .build();
-    }
-
-    public void increaseLike() {
-        this.likeCount++;
-    }
-
-    public void decreaseLike() {
-        if (this.likeCount > 0) {
-            this.likeCount--;
-        }
     }
 }

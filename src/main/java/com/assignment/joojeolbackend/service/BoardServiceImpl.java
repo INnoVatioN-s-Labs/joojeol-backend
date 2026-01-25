@@ -66,7 +66,7 @@ public class BoardServiceImpl implements BoardService {
             return post;
         }
 
-        post.ensurePostLiked().increaseLike();
+        post.addLike();
         post.setReacted(true);
         return postRepository.save(post);
     }
@@ -80,7 +80,7 @@ public class BoardServiceImpl implements BoardService {
             return post;
         }
 
-        post.ensurePostLiked().decreaseLike();
+        post.removeLike();
         post.setReacted(false);
         return postRepository.save(post);
     }

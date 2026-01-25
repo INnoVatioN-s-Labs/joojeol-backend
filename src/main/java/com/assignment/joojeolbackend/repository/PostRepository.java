@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
-    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.hashtags ORDER BY p.createdAt DESC")
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.postLikeList ORDER BY p.createdAt DESC")
     List<Post> findAllByOrderByCreatedAtDesc();
 }

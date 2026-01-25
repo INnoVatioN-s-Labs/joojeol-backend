@@ -27,17 +27,17 @@ public class Post {
 
     private String imageUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_hashtags", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "hashtag")
     private List<String> hashtags = new ArrayList<>();
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private PostLiked postLiked;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private java.util.Set<PostLike> postLikeList = new java.util.LinkedHashSet<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-    
+
     @Column(nullable = false)
     private boolean isReacted = false; // Mocking per-user reaction for now (simpler MVP)
 
@@ -46,18 +46,27 @@ public class Post {
         this.content = content;
         this.imageUrl = imageUrl;
         this.hashtags = hashtags != null ? hashtags : new ArrayList<>();
-        this.postLiked = PostLiked.create(this);
     }
 
     public int getLikeCount() {
-        return postLiked != null ? postLiked.getLikeCount() : 0;
+        return postLikeList.size();
     }
 
-    public PostLiked ensurePostLiked() {
-        if (postLiked == null) {
-            this.postLiked = PostLiked.create(this);
+    public void addLike() {
+        this.postLikeList.add(PostLike.create(this));
+    }
+
+    public void removeLike() {
+        if (!postLikeList.isEmpty()) {
+            java.util.Iterator<PostLike> it = postLikeList.iterator();
+            PostLike last = null;
+            while (it.hasNext()) {
+                last = it.next();
+            }
+            if (last != null) {
+                postLikeList.remove(last);
+            }
         }
-        return postLiked;
     }
 
     public void setReacted(boolean reacted) {
