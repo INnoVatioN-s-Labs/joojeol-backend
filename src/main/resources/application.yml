@@ -1,0 +1,35 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/joojeol-dev
+    username: postgres.kgfdlunachclzhxdxanh
+    password: Rhduddlf12#$
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/joojeol-prod
+    username: postgres.kgfdlunachclzhxdxanh
+    password: Rhduddlf12#$
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
