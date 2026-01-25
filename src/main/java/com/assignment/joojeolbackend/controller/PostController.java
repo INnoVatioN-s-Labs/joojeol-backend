@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +31,18 @@ public class PostController {
     @PostMapping
     public ReturnMessage<PostRes> createPost(@RequestBody PostCreateReq req) {
         Post post = boardService.createPost(req.getContent());
+        return new ReturnMessage<>(new PostRes(post));
+    }
+
+    @PostMapping("/{postId}/like")
+    public ReturnMessage<PostRes> likePost(@PathVariable UUID postId) {
+        Post post = boardService.likePost(postId);
+        return new ReturnMessage<>(new PostRes(post));
+    }
+
+    @PostMapping("/{postId}/unlike")
+    public ReturnMessage<PostRes> unlikePost(@PathVariable UUID postId) {
+        Post post = boardService.unlikePost(postId);
         return new ReturnMessage<>(new PostRes(post));
     }
 }

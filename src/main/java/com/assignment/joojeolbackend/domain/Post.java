@@ -25,14 +25,15 @@ public class Post {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private int reactionCount;
-
     private String imageUrl;
 
     @ElementCollection
     @CollectionTable(name = "post_hashtags", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "hashtag")
     private List<String> hashtags = new ArrayList<>();
+
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private PostLiked postLiked;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -45,10 +46,21 @@ public class Post {
         this.content = content;
         this.imageUrl = imageUrl;
         this.hashtags = hashtags != null ? hashtags : new ArrayList<>();
-        this.reactionCount = 0;
+        this.postLiked = PostLiked.create(this);
     }
 
-    public void increaseReaction() {
-        this.reactionCount++;
+    public int getLikeCount() {
+        return postLiked != null ? postLiked.getLikeCount() : 0;
+    }
+
+    public PostLiked ensurePostLiked() {
+        if (postLiked == null) {
+            this.postLiked = PostLiked.create(this);
+        }
+        return postLiked;
+    }
+
+    public void setReacted(boolean reacted) {
+        this.isReacted = reacted;
     }
 }

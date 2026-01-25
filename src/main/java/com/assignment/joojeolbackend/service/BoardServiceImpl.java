@@ -56,4 +56,32 @@ public class BoardServiceImpl implements BoardService {
         
         return commentRepository.save(comment);
     }
+
+    @Transactional
+    public Post likePost(UUID postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (post.isReacted()) {
+            return post;
+        }
+
+        post.ensurePostLiked().increaseLike();
+        post.setReacted(true);
+        return postRepository.save(post);
+    }
+
+    @Transactional
+    public Post unlikePost(UUID postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (!post.isReacted()) {
+            return post;
+        }
+
+        post.ensurePostLiked().decreaseLike();
+        post.setReacted(false);
+        return postRepository.save(post);
+    }
 }
