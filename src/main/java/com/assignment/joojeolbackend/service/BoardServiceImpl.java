@@ -2,7 +2,9 @@ package com.assignment.joojeolbackend.service;
 
 import com.assignment.joojeolbackend.domain.Comment;
 import com.assignment.joojeolbackend.domain.Post;
+import com.assignment.joojeolbackend.domain.PostLike;
 import com.assignment.joojeolbackend.repository.CommentRepository;
+import com.assignment.joojeolbackend.repository.PostLikeRepository;
 import com.assignment.joojeolbackend.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class BoardServiceImpl implements BoardService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
 
     public List<Post> getAllPosts() {
@@ -58,30 +61,36 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Transactional
-    public Post likePost(UUID postId) {
-        Post post = postRepository.findById(postId)
+    public void likePost(UUID postId) {
+        Post post = postRepository.findByIdWithLikes(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
         if (post.isReacted()) {
-            return post;
+            return;
         }
 
-        post.addLike();
+        PostLike postLike = PostLike.create(post);
+        postLikeRepository.save(postLike);
+        
+        post.getPostLikeList().add(postLike);
         post.setReacted(true);
-        return postRepository.save(post);
     }
 
     @Transactional
-    public Post unlikePost(UUID postId) {
-        Post post = postRepository.findById(postId)
+    public void unlikePost(UUID postId) {
+        Post post = postRepository.findByIdWithLikes(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
         if (!post.isReacted()) {
-            return post;
+            return;
         }
 
-        post.removeLike();
+        if (!post.getPostLikeList().isEmpty()) {
+            PostLike target = post.getPostLikeList().iterator().next();
+            post.getPostLikeList().remove(target);
+            postLikeRepository.delete(target);
+        }
+        
         post.setReacted(false);
-        return postRepository.save(post);
     }
 }

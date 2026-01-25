@@ -35,14 +35,14 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/like")
-    public ReturnMessage<PostRes> likePost(@PathVariable UUID postId) {
-        Post post = boardService.likePost(postId);
-        return new ReturnMessage<>(new PostRes(post));
+    public ReturnMessage<Void> likePost(@PathVariable UUID postId) {
+        boardService.likePost(postId);
+        return new ReturnMessage<>(null);
     }
 
     @PostMapping("/{postId}/unlike")
-    public ReturnMessage<PostRes> unlikePost(@PathVariable UUID postId) {
-        Post post = boardService.unlikePost(postId);
-        return new ReturnMessage<>(new PostRes(post));
+    public ReturnMessage<Void> unlikePost(@PathVariable UUID postId) {
+        boardService.unlikePost(postId);
+        return new ReturnMessage<>(null);
     }
 }
