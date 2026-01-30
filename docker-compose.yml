@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+    backend:
+        build: .
+        container_name: joojeol-backend
+        ports:
+            - '8080:8080'
+        environment:
+            - SPRING_PROFILES_ACTIVE=dev
+            - SPRING_DATA_REDIS_HOST=redis
+        depends_on:
+            - redis
+        networks:
+            - joojeol-network
+
+    redis:
+        image: redis:alpine
+        container_name: joojeol-redis
+        ports:
+            - '6379:6379'
+        networks:
+            - joojeol-network
+
+networks:
+    joojeol-network:
+        driver: bridge
