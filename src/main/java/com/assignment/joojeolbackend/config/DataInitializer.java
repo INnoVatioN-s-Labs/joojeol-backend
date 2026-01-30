@@ -44,14 +44,6 @@ public class DataInitializer {
                 .content("오늘 면접 망친 것 같아... 위로 좀 해줘.")
                 .hashtags(Arrays.asList("취준생", "면접후기", "위로해줘", "화이팅", "우울해"))
                 .build();
-        // Force reaction count and isReacted for mock (need to adjust Entity if setter not avail, assuming builder or field access via repo/update)
-        // Since Entity has no setters for these, we trust default or set via reflection/modified builder if needed for precise mock match.
-        // For MVP, simple save is enough. We can tweak reactionCount manually if needed or just start with 0.
-        // Let's modify Post entity to allow setting these for Mocking if strictly required, but for now let's stick to clean creation.
-        // Actually, the user wants "Dummy Data" corresponding to frontend.
-        // Reflection or adding methods to entity is needed to set reactionCount purely for seeding.
-        // Let's settle for 0 reactions or modify entity slightly. I'll modify entity to have a test/builder constructor that allows reactionCount.
-        // OR just leave it as 0. Code logic: "Data showing" is more important.
         postRepository.save(post1);
 
         Comment c1 = Comment.builder()

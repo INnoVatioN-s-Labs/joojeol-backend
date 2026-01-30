@@ -25,18 +25,19 @@ public class Post {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private int reactionCount;
-
     private String imageUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_hashtags", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "hashtag")
     private List<String> hashtags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private java.util.Set<PostLike> postLikeList = new java.util.LinkedHashSet<>();
+
     @CreationTimestamp
     private LocalDateTime createdAt;
-    
+
     @Column(nullable = false)
     private boolean isReacted = false; // Mocking per-user reaction for now (simpler MVP)
 
@@ -45,10 +46,13 @@ public class Post {
         this.content = content;
         this.imageUrl = imageUrl;
         this.hashtags = hashtags != null ? hashtags : new ArrayList<>();
-        this.reactionCount = 0;
     }
 
-    public void increaseReaction() {
-        this.reactionCount++;
+    public int getLikeCount() {
+        return postLikeList.size();
+    }
+
+    public void setReacted(boolean reacted) {
+        this.isReacted = reacted;
     }
 }

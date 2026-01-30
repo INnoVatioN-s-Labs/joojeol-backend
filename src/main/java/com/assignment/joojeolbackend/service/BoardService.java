@@ -11,4 +11,6 @@ public interface BoardService {
     Post createPost(String content);
     List<Comment> getCommentsByPostId(UUID postId);
     Comment createComment(UUID postId, String content, String parentId);
+    void likePost(UUID postId);
+    void unlikePost(UUID postId);
 }

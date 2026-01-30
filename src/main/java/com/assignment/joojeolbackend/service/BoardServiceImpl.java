@@ -2,7 +2,9 @@ package com.assignment.joojeolbackend.service;
 
 import com.assignment.joojeolbackend.domain.Comment;
 import com.assignment.joojeolbackend.domain.Post;
+import com.assignment.joojeolbackend.domain.PostLike;
 import com.assignment.joojeolbackend.repository.CommentRepository;
+import com.assignment.joojeolbackend.repository.PostLikeRepository;
 import com.assignment.joojeolbackend.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class BoardServiceImpl implements BoardService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
 
     public List<Post> getAllPosts() {
@@ -55,5 +58,39 @@ public class BoardServiceImpl implements BoardService {
                 .build();
         
         return commentRepository.save(comment);
+    }
+
+    @Transactional
+    public void likePost(UUID postId) {
+        Post post = postRepository.findByIdWithLikes(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (post.isReacted()) {
+            return;
+        }
+
+        PostLike postLike = PostLike.create(post);
+        postLikeRepository.save(postLike);
+        
+        post.getPostLikeList().add(postLike);
+        post.setReacted(true);
+    }
+
+    @Transactional
+    public void unlikePost(UUID postId) {
+        Post post = postRepository.findByIdWithLikes(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        if (!post.isReacted()) {
+            return;
+        }
+
+        if (!post.getPostLikeList().isEmpty()) {
+            PostLike target = post.getPostLikeList().iterator().next();
+            post.getPostLikeList().remove(target);
+            postLikeRepository.delete(target);
+        }
+        
+        post.setReacted(false);
     }
 }
