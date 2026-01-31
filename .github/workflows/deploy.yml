@@ -26,6 +26,7 @@ jobs:
             # Inject application.yml from Secrets
             - name: Make application.yml
               run: |
+                  mkdir -p ./src/main/resources
                   cd ./src/main/resources
                   touch application.yml
                   echo "${{ secrets.APPLICATION_YML }}" > application.yml
