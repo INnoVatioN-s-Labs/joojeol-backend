@@ -29,8 +29,8 @@ jobs:
               run: |
                   mkdir -p ./src/main/resources
                   cd ./src/main/resources
-                  touch application.yml
                   echo "${{ secrets.APPLICATION_YML }}" > application.yml
+                  echo "${{ secrets.APPLICATION_LOCAL_YML }}" > application-local.yml
               shell: bash
 
             - name: Build with Gradle
@@ -49,13 +49,17 @@ jobs:
             - name: Checkout source code
               uses: actions/checkout@v4
 
-            # Inject application.yml AGAIN for Docker Build context
+            # Inject configuration files for Docker Build context
             - name: Make application.yml
               run: |
                   mkdir -p ./src/main/resources
                   cd ./src/main/resources
-                  touch application.yml
                   echo "${{ secrets.APPLICATION_YML }}" > application.yml
+                  if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+                      echo "${{ secrets.APPLICATION_PROD_YML }}" > application-prod.yml
+                  else
+                      echo "${{ secrets.APPLICATION_DEV_YML }}" > application-dev.yml
+                  fi
               shell: bash
 
             - name: Set up Docker Buildx
