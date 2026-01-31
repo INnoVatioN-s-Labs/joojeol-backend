@@ -23,6 +23,10 @@ public class BoardServiceImpl implements BoardService {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public List<Post> searchPosts(String keyword) {
+        return postRepository.searchByKeyword(keyword);
+    }
+
     @Transactional
     public Post createPost(String content) {
         // Mock image/hashtags for MVP simplicity or extend later

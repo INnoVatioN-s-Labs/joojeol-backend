@@ -38,6 +38,9 @@ public class Post {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(name = "reaction_count", nullable = false)
+    private int reactionCount = 0;
+
     @Column(nullable = false)
     private boolean isReacted = false; // Mocking per-user reaction for now (simpler MVP)
 
@@ -49,11 +52,14 @@ public class Post {
     }
 
     public int getLikeCount() {
-        return postLikeList.size();
+        return reactionCount;
     }
 
     public void addLike() {
-        this.postLikeList.add(PostLike.create(this));
+        boolean added = this.postLikeList.add(PostLike.create(this));
+        if (added) {
+            reactionCount++;
+        }
     }
 
     public void removeLike() {
@@ -63,8 +69,8 @@ public class Post {
             while (it.hasNext()) {
                 last = it.next();
             }
-            if (last != null) {
-                postLikeList.remove(last);
+            if (last != null && postLikeList.remove(last)) {
+                reactionCount = Math.max(0, reactionCount - 1);
             }
         }
     }
