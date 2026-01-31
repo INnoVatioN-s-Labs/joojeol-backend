@@ -101,6 +101,6 @@ jobs:
                   key: ${{ secrets.EC2_KEY }}
                   script: |
                       cd /home/${{ secrets.EC2_USERNAME }}/joojeol
-                      docker-compose pull
-                      docker-compose up -d
+                      docker compose pull
+                      docker compose up -d
                       docker image prune -f
