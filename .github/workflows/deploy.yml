@@ -8,6 +8,7 @@ on:
 
 jobs:
     # CI Job: Build and Test
+    # Runs on BOTH 'push' and 'pull_request'
     ci:
         runs-on: ubuntu-latest
         steps:
@@ -38,7 +39,8 @@ jobs:
             - name: Run Tests
               run: ./gradlew test
 
-    # CD Job: Build and Push Docker Image (Only on Push to main)
+    # CD Job: Build and Push Docker Image
+    # Runs ONLY on 'push' to main branch (Skipped for PRs)
     cd:
         needs: ci
         if: github.event_name == 'push'
@@ -73,3 +75,32 @@ jobs:
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/joojeol-backend:latest
                       ${{ secrets.DOCKER_USERNAME }}/joojeol-backend:${{ github.sha }}
+
+    # Deploy Job: Deploy to EC2 via SSH
+    deploy:
+        needs: cd
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout source code
+              uses: actions/checkout@v4
+
+            - name: Copy docker-compose.yml to EC2
+              uses: appleboy/scp-action@master
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USERNAME }}
+                  key: ${{ secrets.EC2_KEY }}
+                  source: 'docker-compose.yml'
+                  target: '/home/${{ secrets.EC2_USERNAME }}/joojeol'
+
+            - name: Execute remote commands via SSH
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USERNAME }}
+                  key: ${{ secrets.EC2_KEY }}
+                  script: |
+                      cd /home/${{ secrets.EC2_USERNAME }}/joojeol
+                      docker-compose pull
+                      docker-compose up -d
+                      docker image prune -f
