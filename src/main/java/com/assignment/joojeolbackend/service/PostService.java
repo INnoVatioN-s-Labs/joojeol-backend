@@ -6,7 +6,7 @@ import com.assignment.joojeolbackend.domain.Post;
 import java.util.List;
 import java.util.UUID;
 
-public interface BoardService {
+public interface PostService {
     List<Post> getAllPosts();
     List<Post> searchPosts(String keyword);
     Post createPost(String content);

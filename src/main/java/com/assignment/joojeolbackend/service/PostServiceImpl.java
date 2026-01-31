@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BoardServiceImpl implements BoardService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;

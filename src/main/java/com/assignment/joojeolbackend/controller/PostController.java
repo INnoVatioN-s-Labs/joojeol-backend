@@ -4,9 +4,8 @@ import com.assignment.joojeolbackend.domain.Post;
 import com.assignment.joojeolbackend.dto.common.ReturnMessage;
 import com.assignment.joojeolbackend.dto.post.PostCreateReq;
 import com.assignment.joojeolbackend.dto.post.PostRes;
-import com.assignment.joojeolbackend.service.BoardService;
+import com.assignment.joojeolbackend.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +17,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final BoardService boardService;
+    private final PostService postService;
 
 
     @GetMapping
     public ReturnMessage<List<PostRes>> getPosts() {
-        List<Post> posts = boardService.getAllPosts();
+        List<Post> posts = postService.getAllPosts();
         List<PostRes> postResList = posts.stream()
                 .map(PostRes::new)
                 .collect(Collectors.toList());
@@ -32,7 +31,7 @@ public class PostController {
 
     @GetMapping("/search")
     public ReturnMessage<List<PostRes>> searchPosts(@RequestParam("keyword") String keyword) {
-        List<Post> posts = boardService.searchPosts(keyword);
+        List<Post> posts = postService.searchPosts(keyword);
         List<PostRes> postResList = posts.stream()
                 .map(PostRes::new)
                 .collect(Collectors.toList());
@@ -41,19 +40,19 @@ public class PostController {
 
     @PostMapping
     public ReturnMessage<PostRes> createPost(@RequestBody PostCreateReq req) {
-        Post post = boardService.createPost(req.getContent());
+        Post post = postService.createPost(req.getContent());
         return new ReturnMessage<>(new PostRes(post));
     }
 
     @PostMapping("/{postId}/like")
     public ReturnMessage<Void> likePost(@PathVariable UUID postId) {
-        boardService.likePost(postId);
+        postService.likePost(postId);
         return new ReturnMessage<>(null);
     }
 
     @PostMapping("/{postId}/unlike")
     public ReturnMessage<Void> unlikePost(@PathVariable UUID postId) {
-        boardService.unlikePost(postId);
+        postService.unlikePost(postId);
         return new ReturnMessage<>(null);
     }
 }
