@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
     push:
-        branches: ['main']
+        branches: ['main', 'dev']
     pull_request:
-        branches: ['main']
+        branches: ['main', 'dev']
 
 jobs:
     # CI Job: Build and Test
@@ -40,7 +40,7 @@ jobs:
               run: ./gradlew test
 
     # CD Job: Build and Push Docker Image
-    # Runs ONLY on 'push' to main branch (Skipped for PRs)
+    # Runs ONLY on 'push' (Skipped for PRs)
     cd:
         needs: ci
         if: github.event_name == 'push'
@@ -84,6 +84,18 @@ jobs:
             - name: Checkout source code
               uses: actions/checkout@v4
 
+            - name: Prepare docker-compose for Production
+              run: |
+                  # Replace 'build: .' with 'image: ...' depending on how it's formatted.
+                  # A safer way works by overwriting the file or using envsubst if templates were used.
+                  # Here we will simply construct a production file or use sed to comment out build and add image.
+
+                  # 1. Add image field
+                  sed -i 's|build: .|image: ${{ secrets.DOCKER_USERNAME }}/joojeol-backend:latest|g' docker-compose.yml
+
+                  # Check content (optional debug)
+                  cat docker-compose.yml
+
             - name: Copy docker-compose.yml to EC2
               uses: appleboy/scp-action@master
               with:
@@ -93,14 +105,25 @@ jobs:
                   source: 'docker-compose.yml'
                   target: '/home/${{ secrets.EC2_USERNAME }}/joojeol'
 
+            - name: Set Target Profile
+              id: set-profile
+              run: |
+                  if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+                      echo "APP_PROFILE=prod" >> $GITHUB_ENV
+                  else
+                      echo "APP_PROFILE=dev" >> $GITHUB_ENV
+                  fi
+
             - name: Execute remote commands via SSH
               uses: appleboy/ssh-action@master
               with:
                   host: ${{ secrets.EC2_HOST }}
                   username: ${{ secrets.EC2_USERNAME }}
                   key: ${{ secrets.EC2_KEY }}
+                  envs: APP_PROFILE
                   script: |
                       cd /home/${{ secrets.EC2_USERNAME }}/joojeol
+                      export SPRING_PROFILES_ACTIVE=$APP_PROFILE
                       docker compose pull
                       docker compose up -d
                       docker image prune -f
