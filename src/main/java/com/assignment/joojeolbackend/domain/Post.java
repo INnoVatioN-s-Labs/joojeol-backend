@@ -55,26 +55,6 @@ public class Post {
         return reactionCount;
     }
 
-    public void addLike() {
-        boolean added = this.postLikeList.add(PostLike.create(this));
-        if (added) {
-            reactionCount++;
-        }
-    }
-
-    public void removeLike() {
-        if (!postLikeList.isEmpty()) {
-            java.util.Iterator<PostLike> it = postLikeList.iterator();
-            PostLike last = null;
-            while (it.hasNext()) {
-                last = it.next();
-            }
-            if (last != null && postLikeList.remove(last)) {
-                reactionCount = Math.max(0, reactionCount - 1);
-            }
-        }
-    }
-
     public void setReacted(boolean reacted) {
         this.isReacted = reacted;
     }
