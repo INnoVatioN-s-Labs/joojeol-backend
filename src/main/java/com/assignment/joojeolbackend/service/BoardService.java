@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface BoardService {
     List<Post> getAllPosts();
+    List<Post> searchPosts(String keyword);
     Post createPost(String content);
     List<Comment> getCommentsByPostId(UUID postId);
     Comment createComment(UUID postId, String content, String parentId);
