@@ -39,7 +39,7 @@ jobs:
             - name: Run Tests
               run: ./gradlew test
 
-    # CD Job: Build and Push Docker Image
+    # CD Job: Build, Push, and Deploy
     # Runs ONLY on 'push' (Skipped for PRs)
     cd:
         needs: ci
@@ -75,14 +75,6 @@ jobs:
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/joojeol-backend:latest
                       ${{ secrets.DOCKER_USERNAME }}/joojeol-backend:${{ github.sha }}
-
-    # Deploy Job: Deploy to EC2 via SSH
-    deploy:
-        needs: cd
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout source code
-              uses: actions/checkout@v4
 
             - name: Prepare docker-compose for Production
               run: |
