@@ -20,7 +20,7 @@ src/main/java/com/assignment/joojeolbackend/
 └── repository/      # 데이터베이스 접근
 ```
 
-## 🚀 Getting Started
+## 🚀 Getting Started ....
 
 ### Prerequisites
 
